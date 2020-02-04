@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import java.util.Map;
 
-public class Apps  extends AppCompatActivity {
+public class Apps extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,8 @@ public class Apps  extends AppCompatActivity {
                 queryAndAggregateUsageStats(0, System.currentTimeMillis());
 
         for (String key:lUsageStatsMap.keySet()){
-            list+=key+"\n";
+
+            list+=key+"\n\n"+lUsageStatsMap.get(key).getTotalTimeInForeground()+"\n";
             i++;
         }
         list+="\n"+i+" apps";

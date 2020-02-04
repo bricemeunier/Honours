@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Contacts  extends AppCompatActivity {
+public class Contacts extends AppCompatActivity {
 
     Map<String, String> namePhoneMap = new HashMap<String, String>();
     String TAG = "honours";

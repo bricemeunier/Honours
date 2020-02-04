@@ -5,7 +5,9 @@ import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,8 +24,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnContact = (Button) findViewById(R.id.button);
-        Button btnApp = (Button) findViewById(R.id.button1);
+        Button btnContact = findViewById(R.id.button);
+        Button btnApp = findViewById(R.id.button1);
+        Button btnSms = findViewById(R.id.button2);
+        Button btnLocation= findViewById(R.id.button3);
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -33,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intentMain = new Intent(MainActivity.this,
                             Contacts.class);
                     MainActivity.this.startActivity(intentMain);
-                    Log.i("Content "," Main layout ");
+                    Log.i("Content "," Contact ");
                 }
             });
         }
@@ -41,6 +45,22 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 200);
         }
 
+
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS)
+                == PackageManager.PERMISSION_GRANTED) {
+            btnSms.setOnClickListener(new View.OnClickListener(){
+
+                public void onClick(View v) {
+                    Intent intentMain = new Intent(MainActivity.this,
+                            Sms.class);
+                    MainActivity.this.startActivity(intentMain);
+                    Log.i("Content "," SMS ");
+                }
+            });
+        }
+        else {
+            requestPermissions(new String[]{Manifest.permission.READ_SMS}, 200);
+        }
 
 
         AppOpsManager appOps = (AppOpsManager)
@@ -55,12 +75,27 @@ public class MainActivity extends AppCompatActivity {
                     Intent intentMain = new Intent(MainActivity.this,
                             Apps.class);
                     MainActivity.this.startActivity(intentMain);
-                    Log.i("Content ", " Main layout ");
+                    Log.i("Content ", " Data ");
                 }
             });
         }
         else {
             startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 200);
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            btnLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intentMain = new Intent(MainActivity.this,
+                            Location.class);
+                    MainActivity.this.startActivity(intentMain);
+                    Log.i("Content ", " Location ");
+                }
+            });
+        }
+        else {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
 
     }
