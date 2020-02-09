@@ -10,7 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
-public class Location extends AppCompatActivity {
+//ONLY FOR UI PURPOSE
+//WILL BE DELETED ONCE APP IN BETA
+public class Location extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +20,13 @@ public class Location extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.location);
 
+        getLocation();
+
+    }
+
+
+    public boolean getLocation() {
+        Log.d("ici gg", "getLocation: ");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             android.location.Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -25,11 +34,11 @@ public class Location extends AppCompatActivity {
             String latitude = String.valueOf(location.getLatitude());
 
             TextView tv=findViewById(R.id.tv_location);
-            tv.setText("lon: "+longitude+"\nlat: "+latitude);
-        }
+            tv.setText("lat: "+latitude+"\nlon: "+longitude);
 
+            return true;
+        }
+        else return false;
 
     }
-
-
 }

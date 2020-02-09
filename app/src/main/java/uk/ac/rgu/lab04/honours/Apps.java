@@ -5,6 +5,7 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.util.Map;
@@ -26,16 +27,27 @@ public class Apps extends AppCompatActivity {
 
         String list="";
         Integer i=0;
+        long total_time=0;
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);
         Map<String, UsageStats> lUsageStatsMap = mUsageStatsManager.
-                queryAndAggregateUsageStats(0, System.currentTimeMillis());
+                queryAndAggregateUsageStats(System.currentTimeMillis()-86400000, System.currentTimeMillis());
 
         for (String key:lUsageStatsMap.keySet()){
-
-            list+=key+"\n\n"+lUsageStatsMap.get(key).getTotalTimeInForeground()+"\n";
-            i++;
+            if (lUsageStatsMap.get(key).getTotalTimeInForeground()/1000/60>0) {
+                long minutes = lUsageStatsMap.get(key).getTotalTimeInForeground() / 1000 / 60;
+                list += key + " for " + minutes + " minutes\n\n";
+                i++;
+                total_time += minutes;
+            }
         }
-        list+="\n"+i+" apps";
+        long min_int=total_time%60;
+        String min=""+min_int;
+        if (min_int<10){
+            min="0"+min_int;
+        }
+        long hour=(total_time-min_int)/60;
+        list+="\nLast 24h activity: "+hour+"h"+min;
+        list+="\n"+i+" apps used";
         return list;
     }
 

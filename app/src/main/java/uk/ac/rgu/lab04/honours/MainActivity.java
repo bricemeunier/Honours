@@ -1,11 +1,16 @@
 package uk.ac.rgu.lab04.honours;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AppOpsManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
+import android.os.Build;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -15,15 +20,39 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.Calendar;
+
 
 public class MainActivity extends AppCompatActivity {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        //service sending location to server
+        Intent intent = new Intent(this,BackgroundService.class);
+        PendingIntent pendingIntent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);
+        }
+        else {
+            PendingIntent.getService(this,  0, intent, 0);
+        }
+        //alarm manager
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND,0); // first time
+        long frequency= 120 * 1000; // in ms
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
+
+
+
+
+
+        //UI part for testing purpose
         Button btnContact = findViewById(R.id.button);
         Button btnApp = findViewById(R.id.button1);
         Button btnSms = findViewById(R.id.button2);
