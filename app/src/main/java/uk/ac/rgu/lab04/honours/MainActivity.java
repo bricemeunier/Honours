@@ -4,13 +4,10 @@ import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AppOpsManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -31,7 +28,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+        //Only for testing purpose
+        forUITesting();
+
+
         //service sending location to server
+        startLocationService();
+
+        //service receiving sms
+        startSmsService();
+
+    }
+
+    
+    /***************************
+    **                        **
+    **       SMS SERVICE      **
+    **                        **
+    ***************************/
+    public void startSmsService() {
+        Intent intentSms = new Intent(this,SmsService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intentSms);
+        }
+        else {
+            startService(intentSms);
+        }
+    }
+
+
+    /***************************
+    **                        **
+    **    LOCATION SERVICE    **
+    **                        **
+    ***************************/
+    public void startLocationService(){
         Intent intent = new Intent(this,BackgroundService.class);
         PendingIntent pendingIntent = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -45,18 +76,21 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.SECOND,0); // first time
-        long frequency= 120 * 1000; // in ms
+        long frequency= 600 * 1000; // in ms
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
+    }
 
-
-
-
-
-        //UI part for testing purpose
+    /***************************
+    **                        **
+    **       UI TESTING       **
+    **                        **
+    ***************************/
+    public void forUITesting(){
         Button btnContact = findViewById(R.id.button);
         Button btnApp = findViewById(R.id.button1);
         Button btnSms = findViewById(R.id.button2);
         Button btnLocation= findViewById(R.id.button3);
+
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -126,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
         else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
-
     }
 
 }

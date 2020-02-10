@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -84,7 +83,7 @@ public class BackgroundService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "onCreate");
-        startForeground(12345678, getNotification());
+        startForeground(1, getNotification());
     }
 
     @Override
@@ -112,12 +111,11 @@ public class BackgroundService extends Service {
         mLocationListener = new LocationListener(LocationManager.GPS_PROVIDER);
         try {
             mLocationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListener );
-            Log.d(TAG, mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()+" & "+mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude());
             insertData(String.valueOf(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),String.valueOf(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
         } catch (java.lang.SecurityException ex) {
-            // Log.i(TAG, "fail to request location update, ignore", ex);
+            Log.i(TAG, "fail to request location update, ignore", ex);
         } catch (IllegalArgumentException ex) {
-            // Log.d(TAG, "gps provider does not exist " + ex.getMessage());
+            Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
 
     }
@@ -198,11 +196,6 @@ public class BackgroundService extends Service {
             @Override
             protected void onProgressUpdate(Void... values) {
                 super.onProgressUpdate(values);
-            }
-
-            @Override
-            protected void onPostExecute(String result) {
-                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
             }
         }
 
