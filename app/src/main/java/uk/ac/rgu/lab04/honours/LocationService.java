@@ -21,19 +21,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 
-public class BackgroundService extends Service {
+public class LocationService extends Service {
     private final LocationServiceBinder binder = new LocationServiceBinder();
-    private final String TAG = "BackgroundService";
+    private final String TAG = "LocationService";
     private LocationListener mLocationListener;
     private LocationManager mLocationManager;
-
-    private final int LOCATION_INTERVAL = 500;
-    private final int LOCATION_DISTANCE = 10;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -42,11 +39,10 @@ public class BackgroundService extends Service {
 
     private class LocationListener implements android.location.LocationListener {
 
-        private Location lastLocation = null;
         private final String TAG = "LocationListener";
         private Location mLastLocation;
 
-        public LocationListener(String provider) {
+        LocationListener(String provider) {
             mLastLocation = new Location(provider);
         }
 
@@ -74,7 +70,7 @@ public class BackgroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand:");
+        //log.d(TAG, "onStartCommand:");
         super.onStartCommand(intent, flags, startId);
         startTracking();
         return START_NOT_STICKY;
@@ -82,7 +78,7 @@ public class BackgroundService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "onCreate");
+        //Log.i(TAG, "onCreate");
         startForeground(1, getNotification());
     }
 
@@ -99,17 +95,19 @@ public class BackgroundService extends Service {
     }
 
     private void initializeLocationManager() {
-        Log.d(TAG, "initializeLocationManager:");
+        //log.d(TAG, "initializeLocationManager:");
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
     }
 
     public void startTracking() {
-        Log.d(TAG, "startTracking: ");
+        //log.d(TAG, "startTracking: ");
         initializeLocationManager();
         mLocationListener = new LocationListener(LocationManager.GPS_PROVIDER);
         try {
+            int LOCATION_INTERVAL = 60000;
+            int LOCATION_DISTANCE = 20;
             mLocationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListener );
             insertData(String.valueOf(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),String.valueOf(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
         } catch (java.lang.SecurityException ex) {
@@ -120,12 +118,8 @@ public class BackgroundService extends Service {
 
     }
 
-    public void stopTracking() {
-        this.onDestroy();
-    }
-
     private Notification getNotification() {
-        Log.d(TAG, "getNotification:");
+        //Log.d(TAG, "getNotification:");
         NotificationChannel channel = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             channel = new NotificationChannel("channel_01", "My Channel", NotificationManager.IMPORTANCE_DEFAULT);
@@ -145,14 +139,14 @@ public class BackgroundService extends Service {
 
 
     public class LocationServiceBinder extends Binder {
-        public BackgroundService getService() {
-            Log.d(TAG, "getService:");
-            return BackgroundService.this;
+        public LocationService getService() {
+            //log.d(TAG, "getService:");
+            return LocationService.this;
         }
     }
 
     //send data to phpmyadmin
-    public void insertData(final String latitude, final String longitude){
+    public static void insertData(final String latitude, final String longitude){
 
         class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
             @Override
@@ -162,7 +156,7 @@ public class BackgroundService extends Service {
 
             @Override
             protected String doInBackground(String... params) {
-                String reg_url="http://35.178.169.116/insert.php";
+                String reg_url="http://35.178.169.116/insertLocation.php";
                 String lat=params[0];
                 String lon=params[1];
                 try {
@@ -173,7 +167,7 @@ public class BackgroundService extends Service {
                     httpURLConnection.setDoOutput(true);
                     OutputStream OS = httpURLConnection.getOutputStream();
                     BufferedWriter bufferedWriter = new BufferedWriter(new
-                            OutputStreamWriter(OS, "UTF-8"));
+                            OutputStreamWriter(OS, StandardCharsets.UTF_8));
                     String data= URLEncoder.encode("latitude","UTF-8")+"="+URLEncoder.encode(lat,"UTF-8")
                             +"&"+URLEncoder.encode("longitude","UTF-8")+"="+URLEncoder.encode(lon,"UTF-8");
                     bufferedWriter.write(data);
@@ -183,11 +177,7 @@ public class BackgroundService extends Service {
                     InputStream IS = httpURLConnection.getInputStream();
                     IS.close();
                     return "Registration Success!!";
-                }catch (MalformedURLException e){
-                    Log.d("okpoint",e.getMessage());
-                    e.printStackTrace();
-                }catch (IOException e){
-                    Log.d("okpoint",e.getMessage());
+                } catch (IOException e){
                     e.printStackTrace();
                 }
                 return null;

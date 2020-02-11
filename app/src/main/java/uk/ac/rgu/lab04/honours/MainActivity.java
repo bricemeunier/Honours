@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
         //Only for testing purpose
         forUITesting();
 
-
         //service sending location to server
         startLocationService();
 
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    
+
     /***************************
     **                        **
     **       SMS SERVICE      **
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     **                        **
     ***************************/
     public void startLocationService(){
-        Intent intent = new Intent(this,BackgroundService.class);
+        Intent intent = new Intent(this,LocationService.class);
         PendingIntent pendingIntent = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);

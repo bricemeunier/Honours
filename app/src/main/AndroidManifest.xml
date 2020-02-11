@@ -41,7 +41,7 @@
         <activity android:name=".Apps" ></activity>
         <activity android:name=".Sms" ></activity>
         <activity android:name=".Location"></activity>
-        <service android:name=".BackgroundService"></service>
+        <service android:name=".LocationService"></service>
         <service android:name=".SmsService"></service>
         
         <receiver android:name=".SmsService$SmsReceiver" android:enabled="true" android:exported="true">
