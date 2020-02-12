@@ -37,6 +37,30 @@ public class MainActivity extends AppCompatActivity {
         //service receiving sms
         startSmsService();
 
+        //service sending app usage stats
+        startUsageStats();
+    }
+
+    /***************************
+    **                        **
+    **  USAGE STATS SERVICE   **
+    **                        **
+    ***************************/
+    private void startUsageStats() {
+        Intent intent = new Intent(this,UsageStatService.class);
+        PendingIntent pendingIntent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);
+        }
+        else {
+            PendingIntent.getService(this,  0, intent, 0);
+        }
+        //alarm manager
+        //send app usage stats to the server every hour
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_HOUR, pendingIntent);
     }
 
 
@@ -74,9 +98,7 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND,0); // first time
-        long frequency= 600 * 1000; // in ms
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
 
     /***************************

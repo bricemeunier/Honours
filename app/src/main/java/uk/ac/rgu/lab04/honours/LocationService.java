@@ -82,18 +82,6 @@ public class LocationService extends Service {
         startForeground(1, getNotification());
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mLocationManager != null) {
-            try {
-                mLocationManager.removeUpdates(mLocationListener);
-            } catch (Exception ex) {
-                Log.i(TAG, "fail to remove location listners, ignore", ex);
-            }
-        }
-    }
-
     private void initializeLocationManager() {
         //log.d(TAG, "initializeLocationManager:");
         if (mLocationManager == null) {
@@ -122,7 +110,7 @@ public class LocationService extends Service {
         //Log.d(TAG, "getNotification:");
         NotificationChannel channel = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = new NotificationChannel("channel_01", "My Channel", NotificationManager.IMPORTANCE_DEFAULT);
+            channel = new NotificationChannel("locationService", "Location", NotificationManager.IMPORTANCE_DEFAULT);
         }
 
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -132,7 +120,7 @@ public class LocationService extends Service {
 
         Notification.Builder builder = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            builder = new Notification.Builder(getApplicationContext(), "channel_01").setAutoCancel(true);
+            builder = new Notification.Builder(getApplicationContext(), "locationService").setAutoCancel(true);
         }
         return builder.build();
     }

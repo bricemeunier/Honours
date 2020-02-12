@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
 public class Apps extends AppCompatActivity {
@@ -25,7 +28,33 @@ public class Apps extends AppCompatActivity {
 
     private String getData() {
 
-        String list="";
+        Date dt=new Date();
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(dt);
+
+        //calculate millisecond between now and last o'clock
+        int minu=calendar.get(Calendar.MINUTE);
+        int sec=calendar.get(Calendar.SECOND);
+        int milliSinceLastHour=minu*60*1000+sec*1000;
+
+        long lastOClock=System.currentTimeMillis()-milliSinceLastHour-3600000-3600000;
+        long oClock=System.currentTimeMillis()-milliSinceLastHour-3600000;
+        String list1="";
+        list1+=""+lastOClock+"\n"+oClock+"\n\n";
+        //fetching usage stat from last hour
+        UsageStatsManager mUsageStatsManager1 = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);
+        Map<String, UsageStats> lUsageStatsMap1 = mUsageStatsManager1.
+                queryAndAggregateUsageStats(lastOClock, oClock);
+        for (String key:lUsageStatsMap1.keySet()){
+            if (lUsageStatsMap1.get(key).getTotalTimeInForeground()/1000>0) {
+                long secondes = lUsageStatsMap1.get(key).getTotalTimeInForeground() / 1000;
+                Log.d("12test", key+" : "+lUsageStatsMap1.get(key).getLastTimeUsed());
+                list1 += key + " for " + secondes + " secondes\n\n";
+            }
+        }
+        list1+="\n\n\n";
+
+        String list=list1;
         Integer i=0;
         long total_time=0;
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);

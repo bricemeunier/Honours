@@ -36,11 +36,6 @@ public class SmsService extends Service {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
@@ -49,7 +44,7 @@ public class SmsService extends Service {
         //Log.d(TAG, "getNotification:");
         NotificationChannel channel = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = new NotificationChannel("channel_01", "My Channel", NotificationManager.IMPORTANCE_DEFAULT);
+            channel = new NotificationChannel("SmsService", "Sms", NotificationManager.IMPORTANCE_DEFAULT);
         }
 
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -59,7 +54,7 @@ public class SmsService extends Service {
 
         Notification.Builder builder = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            builder = new Notification.Builder(getApplicationContext(), "channel_01").setAutoCancel(true);
+            builder = new Notification.Builder(getApplicationContext(), "SmsService").setAutoCancel(true);
         }
         return builder.build();
     }
