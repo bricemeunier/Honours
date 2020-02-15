@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         startLocationService();
 
         //service receiving sms
-        startSmsService();
+        //startSmsService();
 
         //service sending app usage stats
         startUsageStats();
@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
     ***************************/
     public void startLocationService(){
         Intent intent = new Intent(this,LocationService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        }
+        /*
         PendingIntent pendingIntent = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);
@@ -99,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        */
+
     }
 
     /***************************

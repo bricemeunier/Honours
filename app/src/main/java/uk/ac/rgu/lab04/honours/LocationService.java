@@ -1,11 +1,15 @@
 package uk.ac.rgu.lab04.honours;
 
+import android.Manifest;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -13,6 +17,9 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -24,12 +31,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.List;
+
+import static android.app.Notification.CATEGORY_SERVICE;
+import static android.app.Notification.VISIBILITY_SECRET;
+import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
 
 
 public class LocationService extends Service {
     private final LocationServiceBinder binder = new LocationServiceBinder();
-    private final String TAG = "LocationService";
-    private LocationListener mLocationListener;
+    private final String TAG = "oklololol";
+    //private LocationListener mLocationListener;
     private LocationManager mLocationManager;
 
     @Override
@@ -37,6 +50,7 @@ public class LocationService extends Service {
         return binder;
     }
 
+    /*
     private class LocationListener implements android.location.LocationListener {
 
         private final String TAG = "LocationListener";
@@ -68,18 +82,40 @@ public class LocationService extends Service {
         }
     }
 
+     */
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //log.d(TAG, "onStartCommand:");
+        Log.d(TAG, "onStartCommand:");
         super.onStartCommand(intent, flags, startId);
         startTracking();
+        stopSelf();
         return START_NOT_STICKY;
     }
 
     @Override
     public void onCreate() {
-        //Log.i(TAG, "onCreate");
+        Log.i(TAG, "onCreate");
         startForeground(1, getNotification());
+    }
+
+    @Override
+    public void onDestroy(){
+
+        //Log.d(TAG, "onDestroy: ");
+        PendingIntent pendingIntent = null;
+        Intent intent = new Intent(this,LocationService.class);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);
+        }
+        else {
+            PendingIntent.getService(this,  0, intent, 0);
+        }
+        //alarm manager
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()+ AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
 
     private void initializeLocationManager() {
@@ -90,8 +126,11 @@ public class LocationService extends Service {
     }
 
     public void startTracking() {
-        //log.d(TAG, "startTracking: ");
+        Log.d(TAG, "startTracking: ");
         initializeLocationManager();
+        android.location.Location l=getLocation();
+        insertData(String.valueOf(l.getLatitude()),String.valueOf(l.getLongitude()));
+        /*
         mLocationListener = new LocationListener(LocationManager.GPS_PROVIDER);
         try {
             int LOCATION_INTERVAL = 60000;
@@ -104,9 +143,58 @@ public class LocationService extends Service {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
 
+         */
+
+    }
+
+    private android.location.Location getLocation() {
+        mLocationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        android.location.Location bestLocation = null;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            for (String provider : providers) {
+                android.location.Location l = mLocationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
+                }
+                if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    bestLocation = l;
+                }
+            }
+        }
+        return bestLocation;
     }
 
     private Notification getNotification() {
+
+
+        // Create mandatory notification channel
+        String channelId = "foregroundService";
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    getString(R.string.app_name),
+                    NotificationManager.IMPORTANCE_NONE);
+            channel.setLockscreenVisibility(VISIBILITY_SECRET);
+            NotificationManager nm =
+                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            nm.createNotificationChannel(channel);
+        }
+        NotificationCompat.Builder nc =
+                new NotificationCompat.Builder(this, channelId);
+        nc.setSmallIcon(R.drawable.ic_launcher_foreground);
+        nc.setColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        nc.setContentTitle("Service running");
+        nc.setWhen(0); // Don't show the time
+        nc.setOngoing(true);
+        nc.setCategory(CATEGORY_SERVICE);
+        nc.setVisibility(VISIBILITY_SECRET);
+        nc.setPriority(PRIORITY_MIN);
+        return nc.build();
+
+        /*
+
+
+
         //Log.d(TAG, "getNotification:");
         NotificationChannel channel = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -123,8 +211,11 @@ public class LocationService extends Service {
             builder = new Notification.Builder(getApplicationContext(), "locationService").setAutoCancel(true);
         }
         return builder.build();
-    }
 
+         */
+
+
+    }
 
     public class LocationServiceBinder extends Binder {
         public LocationService getService() {
