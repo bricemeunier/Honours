@@ -1,8 +1,10 @@
 package uk.ac.rgu.lab04.honours;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -45,7 +47,26 @@ public class UsageStatService extends Service {
         //log.d(TAG, "onStartCommand:");
         super.onStartCommand(intent, flags, startId);
         fetchUsage();
+        stopSelf();
         return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy(){
+        //Log.d(TAG, "onDestroy: ");
+        PendingIntent pendingIntent = null;
+        Intent intent = new Intent(this,UsageStatService.class);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);
+        }
+        else {
+            PendingIntent.getService(this,  0, intent, 0);
+        }
+        //alarm manager
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()+ AlarmManager.INTERVAL_HOUR, pendingIntent);
     }
 
     //fetching last straight hour usage stat (.i.e from 8:00 to 9:00)

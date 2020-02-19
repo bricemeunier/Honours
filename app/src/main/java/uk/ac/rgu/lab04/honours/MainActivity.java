@@ -34,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
         //service sending location to server
         startLocationService();
 
-        //service receiving sms
-        //startSmsService();
-
         //service sending app usage stats
         startUsageStats();
     }
@@ -48,34 +45,8 @@ public class MainActivity extends AppCompatActivity {
     ***************************/
     private void startUsageStats() {
         Intent intent = new Intent(this,UsageStatService.class);
-        PendingIntent pendingIntent = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);
-        }
-        else {
-            PendingIntent.getService(this,  0, intent, 0);
-        }
-        //alarm manager
-        //send app usage stats to the server every hour
-        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_HOUR, pendingIntent);
-    }
-
-
-    /***************************
-    **                        **
-    **       SMS SERVICE      **
-    **                        **
-    ***************************/
-    public void startSmsService() {
-        Intent intentSms = new Intent(this,SmsService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intentSms);
-        }
-        else {
-            startService(intentSms);
+            startForegroundService(intent);
         }
     }
 
@@ -90,21 +61,6 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
         }
-        /*
-        PendingIntent pendingIntent = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);
-        }
-        else {
-            PendingIntent.getService(this,  0, intent, 0);
-        }
-        //alarm manager
-        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-        */
-
     }
 
     /***************************
@@ -120,73 +76,73 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
-                == PackageManager.PERMISSION_GRANTED) {
-            btnContact.setOnClickListener(new View.OnClickListener(){
-
-                public void onClick(View v) {
-                    Intent intentMain = new Intent(MainActivity.this,
-                            Contacts.class);
-                    MainActivity.this.startActivity(intentMain);
-                    Log.i("Content "," Contact ");
-                }
-            });
-        }
-        else {
+                != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 200);
         }
 
-
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS)
-                == PackageManager.PERMISSION_GRANTED) {
-            btnSms.setOnClickListener(new View.OnClickListener(){
-
-                public void onClick(View v) {
-                    Intent intentMain = new Intent(MainActivity.this,
-                            Sms.class);
-                    MainActivity.this.startActivity(intentMain);
-                    Log.i("Content "," SMS ");
-                }
-            });
-        }
-        else {
+                != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_SMS}, 200);
         }
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+        }
 
         AppOpsManager appOps = (AppOpsManager)
                 getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(), getPackageName());
 
-        if (mode == AppOpsManager.MODE_ALLOWED) {
-            btnApp.setOnClickListener(new View.OnClickListener() {
-
-                public void onClick(View v) {
-                    Intent intentMain = new Intent(MainActivity.this,
-                            Apps.class);
-                    MainActivity.this.startActivity(intentMain);
-                    Log.i("Content ", " Data ");
-                }
-            });
-        }
-        else {
+        if (mode != AppOpsManager.MODE_ALLOWED) {
             startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 200);
         }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            btnLocation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intentMain = new Intent(MainActivity.this,
-                            Location.class);
-                    MainActivity.this.startActivity(intentMain);
-                    Log.i("Content ", " Location ");
-                }
-            });
-        }
-        else {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-        }
+
+        btnContact.setOnClickListener(new View.OnClickListener(){
+
+            public void onClick(View v) {
+                Intent intentMain = new Intent(MainActivity.this,
+                        Contacts.class);
+                MainActivity.this.startActivity(intentMain);
+                Log.i("Content "," Contact ");
+            }
+        });
+
+        btnSms.setOnClickListener(new View.OnClickListener(){
+
+            public void onClick(View v) {
+                Intent intentMain = new Intent(MainActivity.this,
+                        Sms.class);
+                MainActivity.this.startActivity(intentMain);
+                Log.i("Content "," SMS ");
+            }
+        });
+
+        btnLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentMain = new Intent(MainActivity.this,
+                        Location.class);
+                MainActivity.this.startActivity(intentMain);
+                Log.i("Content ", " Location ");
+            }
+        });
+
+        btnApp.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                Intent intentMain = new Intent(MainActivity.this,
+                        Apps.class);
+                MainActivity.this.startActivity(intentMain);
+                Log.i("Content ", " Data ");
+            }
+        });
+
+
+
+
+
     }
 
 }

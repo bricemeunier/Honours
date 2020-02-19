@@ -21,7 +21,7 @@ public class Sms extends AppCompatActivity {
 
     public String readSms(){
 
-        Uri uri = Uri.parse("content://sms/inbox");
+        Uri uri = Uri.parse("content://sms/sent");
         Cursor c = getContentResolver().query(uri, null, null ,null,null);
 
         String messages="";

@@ -10,12 +10,10 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -41,8 +39,7 @@ import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
 
 public class LocationService extends Service {
     private final LocationServiceBinder binder = new LocationServiceBinder();
-    private final String TAG = "oklololol";
-    //private LocationListener mLocationListener;
+    private final String TAG = "locationService";
     private LocationManager mLocationManager;
 
     @Override
@@ -50,43 +47,9 @@ public class LocationService extends Service {
         return binder;
     }
 
-    /*
-    private class LocationListener implements android.location.LocationListener {
-
-        private final String TAG = "LocationListener";
-        private Location mLastLocation;
-
-        LocationListener(String provider) {
-            mLastLocation = new Location(provider);
-        }
-
-        @Override
-        public void onLocationChanged(Location location) {
-            mLastLocation = location;
-            Log.i(TAG, "LocationChanged: "+location);
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            Log.e(TAG, "onProviderDisabled: " + provider);
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            Log.e(TAG, "onProviderEnabled: " + provider);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.e(TAG, "onStatusChanged: " + status);
-        }
-    }
-
-     */
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand:");
+        //Log.d(TAG, "onStartCommand:");
         super.onStartCommand(intent, flags, startId);
         startTracking();
         stopSelf();
@@ -126,25 +89,10 @@ public class LocationService extends Service {
     }
 
     public void startTracking() {
-        Log.d(TAG, "startTracking: ");
+        //Log.d(TAG, "startTracking: ");
         initializeLocationManager();
         android.location.Location l=getLocation();
         insertData(String.valueOf(l.getLatitude()),String.valueOf(l.getLongitude()));
-        /*
-        mLocationListener = new LocationListener(LocationManager.GPS_PROVIDER);
-        try {
-            int LOCATION_INTERVAL = 60000;
-            int LOCATION_DISTANCE = 20;
-            mLocationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListener );
-            insertData(String.valueOf(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude()),String.valueOf(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
-        } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "gps provider does not exist " + ex.getMessage());
-        }
-
-         */
-
     }
 
     private android.location.Location getLocation() {
@@ -190,30 +138,6 @@ public class LocationService extends Service {
         nc.setVisibility(VISIBILITY_SECRET);
         nc.setPriority(PRIORITY_MIN);
         return nc.build();
-
-        /*
-
-
-
-        //Log.d(TAG, "getNotification:");
-        NotificationChannel channel = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = new NotificationChannel("locationService", "Location", NotificationManager.IMPORTANCE_DEFAULT);
-        }
-
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        Notification.Builder builder = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            builder = new Notification.Builder(getApplicationContext(), "locationService").setAutoCancel(true);
-        }
-        return builder.build();
-
-         */
-
 
     }
 
