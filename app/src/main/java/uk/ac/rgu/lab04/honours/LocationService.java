@@ -74,11 +74,11 @@ public class LocationService extends Service {
         else {
             PendingIntent.getService(this,  0, intent, 0);
         }
-        //alarm manager
+        //alarm manager every 3 minutes
         AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()+ AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()+ 180000, pendingIntent);
     }
 
     private void initializeLocationManager() {
