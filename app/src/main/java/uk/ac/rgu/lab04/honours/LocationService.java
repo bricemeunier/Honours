@@ -15,9 +15,9 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -34,7 +34,7 @@ import java.util.List;
 
 import static android.app.Notification.CATEGORY_SERVICE;
 import static android.app.Notification.VISIBILITY_SECRET;
-import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
+import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
 
 
 public class LocationService extends Service {
@@ -91,8 +91,9 @@ public class LocationService extends Service {
     public void startTracking() {
         //Log.d(TAG, "startTracking: ");
         initializeLocationManager();
+
         android.location.Location l=getLocation();
-        insertData(String.valueOf(l.getLatitude()),String.valueOf(l.getLongitude()));
+        insertData(Constants.getPrivateKey(this),String.valueOf(l.getLatitude()),String.valueOf(l.getLongitude()));
     }
 
     private android.location.Location getLocation() {
@@ -135,7 +136,7 @@ public class LocationService extends Service {
         nc.setWhen(0); // Don't show the time
         nc.setOngoing(true);
         nc.setCategory(CATEGORY_SERVICE);
-        nc.setVisibility(VISIBILITY_SECRET);
+        nc.setVisibility(NotificationCompat.VISIBILITY_SECRET);
         nc.setPriority(PRIORITY_MIN);
         return nc.build();
 
@@ -148,8 +149,8 @@ public class LocationService extends Service {
         }
     }
 
-    //send data to phpmyadmin
-    public static void insertData(final String latitude, final String longitude){
+    //send data to server
+    public static void insertData(final String key, final String latitude, final String longitude){
 
         class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
             @Override
@@ -159,9 +160,10 @@ public class LocationService extends Service {
 
             @Override
             protected String doInBackground(String... params) {
-                String reg_url="http://35.178.169.116/insertLocation.php";
-                String lat=params[0];
-                String lon=params[1];
+                String reg_url=Constants.URL_SERVER+"insert/insertLocation.php";
+                String key=params[0];
+                String lat=params[1];
+                String lon=params[2];
                 try {
                     URL url = new URL(reg_url);
                     HttpURLConnection httpURLConnection =
@@ -171,7 +173,8 @@ public class LocationService extends Service {
                     OutputStream OS = httpURLConnection.getOutputStream();
                     BufferedWriter bufferedWriter = new BufferedWriter(new
                             OutputStreamWriter(OS, StandardCharsets.UTF_8));
-                    String data= URLEncoder.encode("latitude","UTF-8")+"="+URLEncoder.encode(lat,"UTF-8")
+                    String data= URLEncoder.encode("key","UTF-8")+"="+URLEncoder.encode(key,"UTF-8")
+                            +"&"+URLEncoder.encode("latitude","UTF-8")+"="+URLEncoder.encode(lat,"UTF-8")
                             +"&"+URLEncoder.encode("longitude","UTF-8")+"="+URLEncoder.encode(lon,"UTF-8");
                     bufferedWriter.write(data);
                     bufferedWriter.flush();
@@ -194,7 +197,7 @@ public class LocationService extends Service {
 
         SendPostReqAsyncTask sendPostReqAsyncTask = new SendPostReqAsyncTask();
 
-        sendPostReqAsyncTask.execute(latitude,longitude);
+        sendPostReqAsyncTask.execute(key, latitude,longitude);
     }
 
 }

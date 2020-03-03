@@ -95,7 +95,7 @@ public class UsageStatService extends Service {
         //get stats for each app used
         for (String key:lUsageStatsMap.keySet()){
             if (lUsageStatsMap.get(key).getTotalTimeInForeground()/1000>0) {
-                insertData(String.valueOf(lastOClock),key, String.valueOf(lUsageStatsMap.get(key).getTotalTimeInForeground() / 1000));
+                insertData(Constants.getPrivateKey(this),String.valueOf(lastOClock),key, String.valueOf(lUsageStatsMap.get(key).getTotalTimeInForeground() / 1000));
             }
         }
     }
@@ -129,7 +129,7 @@ public class UsageStatService extends Service {
 
 
     //send data to phpmyadmin
-    public static void insertData(final String timePeriod, final String app, final String timeUsed){
+    public static void insertData(final String key, final String timePeriod, final String app, final String timeUsed){
 
         class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
             @Override
@@ -139,10 +139,11 @@ public class UsageStatService extends Service {
 
             @Override
             protected String doInBackground(String... params) {
-                String reg_url="http://35.178.169.116/insertUsageStat.php";
-                String timePeriod=params[0];
-                String app=params[1];
-                String timeUsed=params[2];
+                String reg_url=Constants.URL_SERVER+"insert/insertUsageStat.php";
+                String key=params[0];
+                String timePeriod=params[1];
+                String app=params[2];
+                String timeUsed=params[3];
                 try {
                     URL url = new URL(reg_url);
                     HttpURLConnection httpURLConnection =
@@ -152,7 +153,8 @@ public class UsageStatService extends Service {
                     OutputStream OS = httpURLConnection.getOutputStream();
                     BufferedWriter bufferedWriter = new BufferedWriter(new
                             OutputStreamWriter(OS, StandardCharsets.UTF_8));
-                    String data= URLEncoder.encode("timePeriod","UTF-8")+"="+URLEncoder.encode(timePeriod,"UTF-8")
+                    String data= URLEncoder.encode("key","UTF-8")+"="+URLEncoder.encode(key,"UTF-8")
+                            +"&"+URLEncoder.encode("timePeriod","UTF-8")+"="+URLEncoder.encode(timePeriod,"UTF-8")
                             +"&"+URLEncoder.encode("app","UTF-8")+"="+URLEncoder.encode(app,"UTF-8")
                             +"&"+URLEncoder.encode("timeUsed","UTF-8")+"="+URLEncoder.encode(timeUsed,"UTF-8");
                     bufferedWriter.write(data);
@@ -176,7 +178,7 @@ public class UsageStatService extends Service {
 
         SendPostReqAsyncTask sendPostReqAsyncTask = new SendPostReqAsyncTask();
 
-        sendPostReqAsyncTask.execute(timePeriod,app,timeUsed);
+        sendPostReqAsyncTask.execute(key,timePeriod,app,timeUsed);
     }
 
 }

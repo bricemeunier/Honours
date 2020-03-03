@@ -7,9 +7,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        //Only for testing purpose
-        forUITesting();
+        //checking permissions and grant them
+        checkingPermissions();
 
         //service sending location to server
         startLocationService();
@@ -62,15 +62,10 @@ public class MainActivity extends AppCompatActivity {
 
     /***************************
     **                        **
-    **       UI TESTING       **
+    **  GRANTING PERMISSIONS  **
     **                        **
     ***************************/
-    public void forUITesting(){
-        Button btnContact = findViewById(R.id.button);
-        Button btnApp = findViewById(R.id.button1);
-        Button btnSms = findViewById(R.id.button2);
-        Button btnLocation= findViewById(R.id.button3);
-
+    public void checkingPermissions(){
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -94,6 +89,17 @@ public class MainActivity extends AppCompatActivity {
         if (mode != AppOpsManager.MODE_ALLOWED) {
             startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 200);
         }
+
+        /////////////////////////
+        //
+        // FOR TESTING PURPOSE ONLY
+        //
+        /////////////////////////
+
+        Button btnContact = findViewById(R.id.button);
+        Button btnApp = findViewById(R.id.button1);
+        Button btnSms = findViewById(R.id.button2);
+        Button btnLocation= findViewById(R.id.button3);
 
 
         btnContact.setOnClickListener(new View.OnClickListener(){
@@ -135,10 +141,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Content ", " Data ");
             }
         });
-
-
-
-
 
     }
 
