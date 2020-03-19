@@ -39,13 +39,13 @@ public class SmsReceiver extends BroadcastReceiver {
                 for (SmsMessage message : messages) {
                     finalSms+=message.getDisplayMessageBody();
                 }
-                insertData(Constants.getPrivateKey(context),String.valueOf(messages[0].getTimestampMillis()),messages[0].getOriginatingAddress(),finalSms);
+                insertData(Constants.getPrivateKey(context),String.valueOf(messages[0].getTimestampMillis()),messages[0].getOriginatingAddress(),finalSms,"0");
             }
         }
     }
 
     //send data to server
-    public static void insertData(final String key, final String date, final String address, final String message){
+    public static void insertData(final String key, final String date, final String address, final String message, final String action){
 
         class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
             @Override
@@ -60,6 +60,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 String date=params[1];
                 String address=params[2];
                 String message=params[3];
+                String action=params[4];
                 try {
                     URL url = new URL(reg_url);
                     HttpURLConnection httpURLConnection =
@@ -71,6 +72,7 @@ public class SmsReceiver extends BroadcastReceiver {
                             OutputStreamWriter(OS, StandardCharsets.UTF_8));
                     String data= URLEncoder.encode("key","UTF-8")+"="+URLEncoder.encode(key,"UTF-8")
                             +"&"+URLEncoder.encode("date","UTF-8")+"="+URLEncoder.encode(date,"UTF-8")
+                            +"&"+URLEncoder.encode("action","UTF-8")+"="+URLEncoder.encode(action,"UTF-8")
                             +"&"+URLEncoder.encode("address","UTF-8")+"="+URLEncoder.encode(address,"UTF-8")
                             +"&"+URLEncoder.encode("message","UTF-8")+"="+URLEncoder.encode(message,"UTF-8");
                     bufferedWriter.write(data);
@@ -94,7 +96,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
         SendPostReqAsyncTask sendPostReqAsyncTask = new SendPostReqAsyncTask();
 
-        sendPostReqAsyncTask.execute(key,date,address,message);
+        sendPostReqAsyncTask.execute(key,date,address,message,action);
     }
 
 
