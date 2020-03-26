@@ -1,23 +1,28 @@
 package uk.ac.rgu.lab04.honours;
 
+import android.app.AppOpsManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ExecutionException;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
 
 public class Login extends AppCompatActivity {
 
@@ -34,7 +39,7 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Login()) {
+        if (Login() && checkingPermissions()) {
             validLogin();
         }
         else {
@@ -45,6 +50,51 @@ public class Login extends AppCompatActivity {
         }
     }
 
+    public boolean checkingPermissions(){
+
+        boolean usageAllowed=false;
+
+        AppOpsManager appOps = (AppOpsManager)
+                getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), getPackageName());
+
+        if (mode != AppOpsManager.MODE_ALLOWED) {
+            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+            startActivity(intent);
+        }
+        else {
+            usageAllowed=true;
+        }
+
+        // The request code used in ActivityCompat.requestPermissions()
+        // and returned in the Activity's onRequestPermissionsResult()
+        int PERMISSION_ALL = 1;
+        String[] PERMISSIONS = {
+                android.Manifest.permission.READ_CONTACTS,
+                android.Manifest.permission.READ_SMS,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+        };
+
+        if (!hasPermissions(this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
+        else {
+            return usageAllowed;
+        }
+        return false;
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     public boolean Login() {
         try {
@@ -83,7 +133,7 @@ public class Login extends AppCompatActivity {
         edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if(i== EditorInfo.IME_ACTION_DONE){
+                if(i== EditorInfo.IME_ACTION_DONE && checkingPermissions()){
                     validateKey(edittext.getText().toString());
                     return true;
                 }
