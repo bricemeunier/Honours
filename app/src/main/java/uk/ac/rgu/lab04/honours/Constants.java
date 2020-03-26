@@ -2,7 +2,6 @@ package uk.ac.rgu.lab04.honours;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;

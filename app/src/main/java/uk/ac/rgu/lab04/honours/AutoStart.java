@@ -11,6 +11,7 @@ public class AutoStart extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(new Intent(context,LocationService.class));
             context.startForegroundService(new Intent(context,UsageStatService.class));
+            context.startForegroundService(new Intent(context,ListenSmsMmsService.class));
         }
     }
 }

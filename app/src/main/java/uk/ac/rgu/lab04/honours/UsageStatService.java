@@ -10,6 +10,8 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
@@ -44,7 +46,6 @@ public class UsageStatService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //log.d(TAG, "onStartCommand:");
         super.onStartCommand(intent, flags, startId);
         fetchUsage();
         stopSelf();
@@ -94,8 +95,15 @@ public class UsageStatService extends Service {
 
         //get stats for each app used
         for (String key:lUsageStatsMap.keySet()){
+            final PackageManager pm = getApplicationContext().getPackageManager();
+            ApplicationInfo ai;
+            try {
+                ai = pm.getApplicationInfo( key, 0);
+            } catch (final PackageManager.NameNotFoundException e) {
+                ai = null;
+            }
             if (lUsageStatsMap.get(key).getTotalTimeInForeground()/1000>0) {
-                insertData(Constants.getPrivateKey(this),String.valueOf(lastOClock),key, String.valueOf(lUsageStatsMap.get(key).getTotalTimeInForeground() / 1000));
+                insertData(Constants.getPrivateKey(this),String.valueOf(lastOClock), String.valueOf(pm.getApplicationLabel(ai)), String.valueOf(lUsageStatsMap.get(key).getTotalTimeInForeground() / 1000));
             }
         }
     }

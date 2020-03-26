@@ -18,7 +18,6 @@ import android.os.IBinder;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import android.util.Log;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -39,12 +38,16 @@ import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
 
 public class LocationService extends Service {
     private final LocationServiceBinder binder = new LocationServiceBinder();
-    private final String TAG = "locationService";
     private LocationManager mLocationManager;
 
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
+    }
+
+    @Override
+    public void onCreate() {
+        startForeground(1, getNotification());
     }
 
     @Override
@@ -56,23 +59,17 @@ public class LocationService extends Service {
         return START_NOT_STICKY;
     }
 
-    @Override
-    public void onCreate() {
-        Log.i(TAG, "onCreate");
-        startForeground(1, getNotification());
-    }
 
     @Override
     public void onDestroy(){
 
-        //Log.d(TAG, "onDestroy: ");
         PendingIntent pendingIntent = null;
         Intent intent = new Intent(this,LocationService.class);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             pendingIntent = PendingIntent.getForegroundService(this,  0, intent, 0);
         }
         else {
-            PendingIntent.getService(this,  0, intent, 0);
+            PendingIntent.getService(this,  2101, intent, 0);
         }
         //alarm manager every 3 minutes
         AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
@@ -89,7 +86,6 @@ public class LocationService extends Service {
     }
 
     public void startTracking() {
-        //Log.d(TAG, "startTracking: ");
         initializeLocationManager();
 
         android.location.Location l=getLocation();

@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
+import android.widget.Toast;
 
 public class PhoneChargingReceiver extends BroadcastReceiver {
     @Override
@@ -13,17 +15,17 @@ public class PhoneChargingReceiver extends BroadcastReceiver {
                 new Intent(context,UsageStatService.class),
                 PendingIntent.FLAG_NO_CREATE) == null);
 
-        if (alarmUsageUp) {
+        if (!alarmUsageUp) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(new Intent(context,UsageStatService.class));
             }
         }
 
-        boolean alarmLocationUp = (PendingIntent.getBroadcast(context, 2100,
+        boolean alarmLocationUp = (PendingIntent.getBroadcast(context, 2101,
                 new Intent(context,LocationService.class),
                 PendingIntent.FLAG_NO_CREATE) == null);
 
-        if (alarmLocationUp) {
+        if (!alarmLocationUp) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(new Intent(context,LocationService.class));
             }

