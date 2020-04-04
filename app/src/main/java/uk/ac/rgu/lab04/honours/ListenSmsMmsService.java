@@ -1,18 +1,5 @@
 package uk.ac.rgu.lab04.honours;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -26,7 +13,19 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 
 public class ListenSmsMmsService extends Service {
@@ -77,6 +76,7 @@ public class ListenSmsMmsService extends Service {
 
         return START_STICKY;
     }
+
 
     class SMSObserver extends ContentObserver{
 
@@ -349,7 +349,7 @@ public class ListenSmsMmsService extends Service {
                 id_mdg=msg_id;
             }
         }
-    }//smsObserver class closed
+    }
 
 
     public static void insertData(final String key, final String date, final String address, final String message, final String action){

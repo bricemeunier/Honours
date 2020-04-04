@@ -136,7 +136,7 @@ public class UsageStatService extends Service {
 
 
 
-    //send data to phpmyadmin
+    //send data to server
     public static void insertData(final String key, final String timePeriod, final String app, final String timeUsed){
 
         class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
