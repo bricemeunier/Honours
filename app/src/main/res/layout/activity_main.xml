@@ -10,7 +10,7 @@
         android:id="@+id/destroyApp"
         android:layout_width="wrap_content"
         android:layout_height="88dp"
-        android:text=""
+        android:text="The installation can take a few minutes, please do not close the app or turn of the phone"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -79,10 +79,6 @@ public class ListenSmsMmsService extends Service {
 
 
     class SMSObserver extends ContentObserver{
-
-        private int type_msg=0;
-        private String id_mdg="";
-
         SMSObserver(Handler handler) {
             super(handler);
 
@@ -339,14 +335,12 @@ public class ListenSmsMmsService extends Service {
 
         //send data to server
         private void sendToServer(int type, String msg_id, String phone, String body, String date,String action) {
-            if (type_msg != type || !id_mdg.equals(msg_id)) {
+            if (!Constants.checkLastSmsId(getApplicationContext(),msg_id, String.valueOf(type))) {
+                Constants.setLastSmsId(getApplicationContext(),msg_id, String.valueOf(type));
                 if (phone.startsWith("+")){
                     phone="0"+phone.substring(3);
                 }
                 insertData(Constants.getPrivateKey(getApplicationContext()),date,phone,body,action);
-
-                type_msg=type;
-                id_mdg=msg_id;
             }
         }
     }

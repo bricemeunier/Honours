@@ -1,5 +1,6 @@
 package uk.ac.rgu.lab04.honours;
 
+import android.Manifest;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -71,9 +72,11 @@ public class Login extends AppCompatActivity {
         // and returned in the Activity's onRequestPermissionsResult()
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
-                android.Manifest.permission.READ_CONTACTS,
-                android.Manifest.permission.READ_SMS,
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.READ_SMS,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.READ_CALL_LOG,
+                Manifest.permission.WRITE_CALL_LOG
         };
 
         if (!hasPermissions(this, PERMISSIONS)) {

